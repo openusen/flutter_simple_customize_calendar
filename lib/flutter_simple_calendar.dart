@@ -112,7 +112,7 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
     else
       _dayTextStyle = widget.dayTextStyle;
 
-    DateTime startDate = _getMonthLastDay(_minDate);
+    DateTime startDate = _getMonthFirstDay(_minDate);
     DateTime endDate = _getMonthLastDay(_maxDate);
     for (int i = 0;
     endDate
