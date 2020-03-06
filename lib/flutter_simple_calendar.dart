@@ -280,7 +280,7 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
 
   List<Widget> _getPage() {
     List<Widget> pageList = [];
-    DateTime startDate = _getMonthLastDay(_minDate);
+    DateTime startDate = _getMonthFirstDay(_minDate);
     DateTime endDate = _getMonthLastDay(_maxDate);
     for (int i = 0;
     endDate
