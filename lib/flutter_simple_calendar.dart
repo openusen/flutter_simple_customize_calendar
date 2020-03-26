@@ -18,28 +18,36 @@ typedef Widget WeekdayContainer(String weekdayStr);
 
 class FlutterSimpleCalendar extends StatefulWidget {
   final String locale;
-  final DateTime targetDay;
-  final DateTime limitMinDate;
-  final DateTime limitMaxDate;
-  final int firstWeekday;
-  final WEEKDAY_PATTERN weekDayPattern;
+  final DateTime targetDay; // default: DateTime.now()
+  final DateTime limitMinDate; // default: 30 years ago from DateTime.now()
+  final DateTime limitMaxDate; // default: 30 years from DateTime.now()
+  final int firstWeekday; // default: 0 (sunday)
+  final WEEKDAY_PATTERN weekDayPattern; // default: short
   final BoxDecoration weekdayContainerDecoration;
-  final BoxDecoration dayContainerDecoration;
+  final BorderRadius dayContainerRadius;
+  final Color dayContainerDefaultColor;
+  final Color dayContainerSelectedColor;
+  final Color dayContainerDisableColor;
   final Map<int, TextStyle> dayTextStyle;
   final List<TextStyle> weekdayTextStyle;
   final TextStyle otherTargetMonthTextStyle;
   final TextStyle disableTextStyle;
   final Function(DateTime) onDayPressed;
+  final Function(List<DateTime>) onRangedChange;
   final DayContainer dayWidget;
   final HeaderContainer headerWidget;
   final WeekdayContainer weekdayWidget;
+  final bool rangedSelectable; // default: false
 
-  const FlutterSimpleCalendar({
+  FlutterSimpleCalendar({
     Key key,
     this.locale = 'en',
     this.weekDayPattern = WEEKDAY_PATTERN.short,
     this.weekdayContainerDecoration = const BoxDecoration(),
-    this.dayContainerDecoration = const BoxDecoration(),
+    this.dayContainerRadius,
+    this.dayContainerDefaultColor = Colors.white,
+    this.dayContainerSelectedColor = Colors.blue,
+    this.dayContainerDisableColor = Colors.grey,
     this.dayTextStyle,
     this.otherTargetMonthTextStyle = const TextStyle(
       color: Colors.grey,
@@ -51,10 +59,13 @@ class FlutterSimpleCalendar extends StatefulWidget {
       color: Colors.grey,
     ),
     @required this.onDayPressed,
+    this.onRangedChange,
     this.dayWidget,
     this.headerWidget,
     this.weekdayTextStyle,
-    this.weekdayWidget, this.firstWeekday = 0,
+    this.weekdayWidget,
+    this.firstWeekday = 0,
+    this.rangedSelectable = false,
   }) : super(key: key);
 
   @override
@@ -65,23 +76,35 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
   DateTime targetDay;
   DateTime _currentMonth;
   List<TextStyle> _weekdayTextStyle = [];
-  Map<int, TextStyle> _dayTextStyle;
+  Map<int, TextStyle> _dayTextStyle = {};
   PageController _controller;
   DateTime _minDate;
   DateTime _maxDate;
   int _currentPage;
+  List<DateTime> _rangedSelectedDate;
 
   @override
   void initState() {
     super.initState();
     initializeDateFormatting();
 
+    if (_rangedSelectedDate == null ||
+        _rangedSelectedDate.length != 2 ||
+        _rangedSelectedDate[0].difference(_rangedSelectedDate[1]).inDays < 0) {
+      _rangedSelectedDate = [
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
+      ];
+    }
+
     _minDate = widget.limitMinDate == null
         ? DateTime(DateTime.now().year - 30)
-        : widget.limitMinDate;
+        : DateTime(widget.limitMinDate.year, widget.limitMinDate.month,
+            widget.limitMinDate.day);
     _maxDate = widget.limitMaxDate == null
         ? DateTime(DateTime.now().year + 30)
-        : widget.limitMaxDate;
+        : DateTime(widget.limitMaxDate.year, widget.limitMaxDate.month,
+            widget.limitMaxDate.day);
 
     if (widget.targetDay == null)
       targetDay = DateTime(
@@ -105,9 +128,9 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
       for (int i = 1; i <= 7; i++) {
         _dayTextStyle.putIfAbsent(
             i,
-                () => TextStyle(
-              color: Colors.black,
-            ));
+            () => TextStyle(
+                  color: Colors.black,
+                ));
       }
     else
       _dayTextStyle = widget.dayTextStyle;
@@ -115,15 +138,15 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
     DateTime startDate = _getMonthFirstDay(_minDate);
     DateTime endDate = _getMonthLastDay(_maxDate);
     for (int i = 0;
-    endDate
-        .difference(DateTime(
-        startDate.year, startDate.month + i, startDate.day))
-        .inDays >=
-        0;
-    i++) {
+        endDate
+                .difference(DateTime(
+                    startDate.year, startDate.month + i, startDate.day))
+                .inDays >=
+            0;
+        i++) {
       if (DateTime(startDate.year, startDate.month + i)
-          .difference(DateTime(targetDay.year, targetDay.month))
-          .inDays ==
+              .difference(DateTime(targetDay.year, targetDay.month))
+              .inDays ==
           0) {
         _controller = PageController(
           initialPage: i,
@@ -154,8 +177,9 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
   }
 
   DateTime _getShowFirstDay(DateTime targetMonthDate) {
-    return _getMonthFirstDay(targetMonthDate)
-        .add(Duration(days: -_getMonthFirstDay(targetMonthDate).weekday + widget.firstWeekday));
+    return _getMonthFirstDay(targetMonthDate).add(Duration(
+        days:
+            -_getMonthFirstDay(targetMonthDate).weekday + widget.firstWeekday));
   }
 
   List<Widget> _getShowWeekday(DateTime targetMonthDate) {
@@ -168,13 +192,15 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
       }
       switch (widget.weekDayPattern) {
         case WEEKDAY_PATTERN.short:
-          weekdayStr = DateFormat.E(widget.locale).dateSymbols.SHORTWEEKDAYS[index];
+          weekdayStr =
+              DateFormat.E(widget.locale).dateSymbols.SHORTWEEKDAYS[index];
           break;
         case WEEKDAY_PATTERN.normal:
           weekdayStr = DateFormat.E(widget.locale).dateSymbols.WEEKDAYS[index];
           break;
         default:
-          weekdayStr = DateFormat.E(widget.locale).dateSymbols.SHORTWEEKDAYS[index];
+          weekdayStr =
+              DateFormat.E(widget.locale).dateSymbols.SHORTWEEKDAYS[index];
           break;
       }
 
@@ -182,16 +208,16 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
         widget.weekdayWidget != null
             ? widget.weekdayWidget(weekdayStr)
             : Expanded(
-          child: Container(
-            decoration: widget.weekdayContainerDecoration,
-            child: Center(
-              child: Text(
-                weekdayStr,
-                style: _weekdayTextStyle[index],
+                child: Container(
+                  decoration: widget.weekdayContainerDecoration,
+                  child: Center(
+                    child: Text(
+                      weekdayStr,
+                      style: _weekdayTextStyle[index],
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
       );
     }
 
@@ -209,11 +235,11 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
         weekWidgetList.add(
           widget.dayWidget != null
               ? widget.dayWidget(
-              showDate,
-              targetMonthDate,
-              _checkPrevDayMinDate(showDate) ||
-                  _checkNextDayMaxDate(showDate),
-              widget.onDayPressed)
+                  showDate,
+                  targetMonthDate,
+                  _checkPrevDayMinDate(showDate) ||
+                      _checkNextDayMaxDate(showDate),
+                  widget.onDayPressed)
               : _getDayContainer(showDate, targetMonthDate),
         );
       }
@@ -232,24 +258,78 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
   Widget _getDayContainer(DateTime showDate, DateTime targetMonthDate) {
     return Expanded(
       child: SizedBox(
-        height: double.infinity,
         width: double.infinity,
-        child: FlatButton(
-          color: showDate.difference(targetDay).inDays == 0
-              ? Colors.yellow
-              : Colors.transparent,
-          disabledTextColor: widget.disableTextStyle.color,
-          textColor: targetMonthDate.month == showDate.month
-              ? _dayTextStyle[showDate.weekday].color
-              : widget.otherTargetMonthTextStyle.color,
-          onPressed:
-          _checkPrevDayMinDate(showDate) || _checkNextDayMaxDate(showDate)
-              ? null
-              : () {
-            widget.onDayPressed(showDate);
-          },
-          child: Text(
-            '${showDate.day}',
+        height: double.infinity,
+        child: Material(
+          borderRadius: widget.dayContainerRadius != null
+              ? widget.dayContainerRadius
+              : BorderRadius.circular(0),
+          color: _checkPrevDayMinDate(showDate) ||
+                  _checkNextDayMaxDate(showDate)
+              ? widget.dayContainerDisableColor
+              : widget.rangedSelectable
+                  ? _rangedSelectedDate[0].difference(showDate).inDays <= 0 &&
+                          _rangedSelectedDate[1].difference(showDate).inDays >=
+                              0
+                      ? widget.dayContainerSelectedColor
+                      : widget.dayContainerDefaultColor
+                  : showDate.difference(targetDay).inDays == 0
+                      ? widget.dayContainerSelectedColor
+                      : widget.dayContainerDefaultColor,
+          child: FlatButton(
+            disabledTextColor: widget.disableTextStyle.color,
+            textColor: targetMonthDate.month == showDate.month
+                ? _dayTextStyle[showDate.weekday].color
+                : widget.otherTargetMonthTextStyle.color,
+            onPressed:
+                _checkPrevDayMinDate(showDate) || _checkNextDayMaxDate(showDate)
+                    ? null
+                    : () {
+                        setState(() {
+                          targetDay = showDate;
+                          if (widget.rangedSelectable) {
+                            if (_rangedSelectedDate[0] == showDate ||
+                                _rangedSelectedDate[1] == showDate) {
+                              _rangedSelectedDate[0] = showDate;
+                              _rangedSelectedDate[1] = showDate;
+                            } else if (_rangedSelectedDate[0]
+                                    .difference(showDate)
+                                    .inDays >
+                                0) {
+                              _rangedSelectedDate[0] = showDate;
+                            } else if (_rangedSelectedDate[1]
+                                    .difference(showDate)
+                                    .inDays <
+                                0) {
+                              _rangedSelectedDate[1] = showDate;
+                            } else if (_rangedSelectedDate[0]
+                                    .difference(showDate)
+                                    .inDays
+                                    .abs() <=
+                                _rangedSelectedDate[1]
+                                    .difference(showDate)
+                                    .inDays
+                                    .abs()) {
+                              _rangedSelectedDate[0] = showDate;
+                            } else if (_rangedSelectedDate[0]
+                                    .difference(showDate)
+                                    .inDays
+                                    .abs() >
+                                _rangedSelectedDate[1]
+                                    .difference(showDate)
+                                    .inDays
+                                    .abs()) {
+                              _rangedSelectedDate[1] = showDate;
+                            }
+                          }
+                        });
+                        widget.onDayPressed(showDate);
+                        if (widget.onRangedChange != null)
+                          widget.onRangedChange(_rangedSelectedDate);
+                      },
+            child: Text(
+              '${showDate.day}',
+            ),
           ),
         ),
       ),
@@ -258,15 +338,15 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
 
   bool _checkPrevMonthShowDisable(DateTime targetDate) {
     return _minDate
-        .difference(_getMonthFirstDay(targetDate).add(Duration(days: -1)))
-        .inMinutes >
+            .difference(_getMonthFirstDay(targetDate).add(Duration(days: -1)))
+            .inMinutes >
         0;
   }
 
   bool _checkNextMonthShowDisable(DateTime targetDate) {
     return _maxDate
-        .difference(_getMonthLastDay(targetDate).add(Duration(days: 1)))
-        .inMinutes <
+            .difference(_getMonthLastDay(targetDate).add(Duration(days: 1)))
+            .inMinutes <
         0;
   }
 
@@ -283,12 +363,12 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
     DateTime startDate = _getMonthFirstDay(_minDate);
     DateTime endDate = _getMonthLastDay(_maxDate);
     for (int i = 0;
-    endDate
-        .difference(DateTime(
-        startDate.year, startDate.month + i, startDate.day))
-        .inDays >=
-        0;
-    i++) {
+        endDate
+                .difference(DateTime(
+                    startDate.year, startDate.month + i, startDate.day))
+                .inDays >=
+            0;
+        i++) {
       pageList.add(Column(
         children: _getDay(DateTime(startDate.year, startDate.month + i)),
       ));
@@ -303,19 +383,21 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
           onPressed: _checkPrevMonthShowDisable(_currentMonth)
               ? null
               : () {
-            _controller.previousPage(
-                duration: Duration(milliseconds: 500), curve: null);
-          },
+                  _controller.previousPage(
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.easeInOutQuart);
+                },
           child: Icon(Icons.arrow_back_ios),
         ),
-        Text('${DateFormat.yM(widget.locale).format(targetDay)}'),
+        Text('${DateFormat.yM(widget.locale).format(_currentMonth)}'),
         FlatButton(
           onPressed: _checkNextMonthShowDisable(_currentMonth)
               ? null
               : () {
-            _controller.nextPage(
-                duration: Duration(milliseconds: 500), curve: null);
-          },
+                  _controller.nextPage(
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.easeInOutQuart);
+                },
           child: Icon(Icons.arrow_forward_ios),
         ),
       ],
@@ -328,16 +410,18 @@ class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
       children: <Widget>[
         widget.headerWidget != null
             ? widget.headerWidget(
-            targetDay,
-            _checkPrevMonthShowDisable(_currentMonth),
-            _checkNextMonthShowDisable(_currentMonth),
-            _currentMonth, () {
-          _controller.animateToPage(_currentPage - 1,
-              duration: Duration(milliseconds: 500), curve: Curves.easeInOutQuart);
-        }, () {
-          _controller.animateToPage(_currentPage + 1,
-              duration: Duration(milliseconds: 500), curve: Curves.easeInOutQuart);
-        })
+                targetDay,
+                _checkPrevMonthShowDisable(_currentMonth),
+                _checkNextMonthShowDisable(_currentMonth),
+                _currentMonth, () {
+                _controller.animateToPage(_currentPage - 1,
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOutQuart);
+              }, () {
+                _controller.animateToPage(_currentPage + 1,
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOutQuart);
+              })
             : _getHeader(),
         Row(
           children: _getShowWeekday(targetDay),

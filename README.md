@@ -1,14 +1,30 @@
 # flutter_simple_calendar
 
-A new Flutter package.
+This package allows users to implement a customizable calendar.
 
-## Getting Started
+## Usage
+To Use this package, add ```flutter_simple_calendar``` as a dependency in your pubspec.yaml file.
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+### Example
+The required parameter is onPressed.
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+You can try three different calendars in the example.
+
+#### Simple Example
+This is a basic widget with only onPressed set.
+![simple_example_snapshot](https://github.com/openusen/flutter_simple_calendar/tree/master/example/sample_image/simple_example_snapshot.png)
+
+#### Custom Parameter Example
+Set various parameters,Customized this calendar.
+
+![custom_param_example_snapshot](https://github.com/openusen/flutter_simple_calendar/tree/master/example/sample_image/custom_example_snapshot.png)
+
+#### Custom Container Example
+If you want a more personalized look, you can write the Container itself.
+If you use this function when specifying the range, you need to control and display the range yourself.
+
+![custom_container_example_snapshot](https://github.com/openusen/flutter_simple_calendar/tree/master/example/sample_image/custom_container_snapshot.png)
+
+
+### Sample Video
+![sample_video](https://github.com/openusen/flutter_simple_calendar/tree/master/example/sample_video/sample_video.gif)
