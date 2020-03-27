@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_simple_calendar/flutter_simple_calendar.dart';
-import 'package:intl/intl.dart' show DateFormat;
 
 class CustomParamExample extends StatefulWidget {
   @override
