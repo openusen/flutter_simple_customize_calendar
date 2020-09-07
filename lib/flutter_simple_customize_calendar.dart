@@ -16,7 +16,7 @@ typedef Widget HeaderContainer(
     Function() onRightPressed);
 typedef Widget WeekdayContainer(String weekdayStr);
 
-class FlutterSimpleCalendar extends StatefulWidget {
+class FlutterSimpleCustomizeCalendar extends StatefulWidget {
   final String locale;
   final DateTime targetDay; // default: DateTime.now()
   final DateTime limitMinDate; // default: 30 years ago from DateTime.now()
@@ -39,7 +39,7 @@ class FlutterSimpleCalendar extends StatefulWidget {
   final WeekdayContainer weekdayWidget;
   final bool rangedSelectable; // default: false
 
-  FlutterSimpleCalendar({
+  FlutterSimpleCustomizeCalendar({
     Key key,
     this.locale = 'en',
     this.weekDayPattern = WEEKDAY_PATTERN.short,
@@ -69,10 +69,10 @@ class FlutterSimpleCalendar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FlutterSimpleCalendarState createState() => _FlutterSimpleCalendarState();
+  _FlutterSimpleCustomizeCalendarState createState() => _FlutterSimpleCustomizeCalendarState();
 }
 
-class _FlutterSimpleCalendarState extends State<FlutterSimpleCalendar> {
+class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeCalendar> {
   DateTime targetDay;
   DateTime _currentMonth;
   List<TextStyle> _weekdayTextStyle = [];

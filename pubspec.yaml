@@ -1,8 +1,8 @@
-name: flutter_simple_calendar
+name: flutter_simple_customize_calendar
 description: This package allows users to implement a customizable calendar.
 version: 1.0.0
 author: rian-hotate
-repository: https://github.com/openusen/flutter_simple_calendar
+repository: https://github.com/openusen/flutter_simple_customize_calendar
 
 environment:
   sdk: ">=2.1.0 <3.0.0"

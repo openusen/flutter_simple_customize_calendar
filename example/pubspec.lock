@@ -62,7 +62,7 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_simple_calendar:
+  flutter_simple_customize_calendar:
     dependency: "direct dev"
     description:
       path: ".."
