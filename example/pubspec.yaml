@@ -1,5 +1,5 @@
-name: flutter_simple_calendar_example
-description: Demonstrates how to use the flutter_simple_calendar plugin.
+name: flutter_simple_customize_calendar_example
+description: Demonstrates how to use the flutter_simple_customize_calendar plugin.
 publish_to: 'none'
 
 environment:
@@ -17,7 +17,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_simple_calendar:
+  flutter_simple_customize_calendar:
     path: ../
 
 # For information on the generic Dart part of this file, see the

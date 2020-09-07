@@ -1,4 +1,4 @@
-package rianhotate.flutter_simple_calendar_example
+package rianhotate.flutter_simple_customize_calendar_example
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_simple_calendar/flutter_simple_calendar.dart';
+import 'package:flutter_simple_customize_calendar/flutter_simple_customize_calendar.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
 class CustomContainerExample extends StatefulWidget {
@@ -158,7 +158,7 @@ class _CustomContainerExampleState extends State<CustomContainerExample> {
         title: const Text('Custom Calendar'),
       ),
       body: Center(
-        child: FlutterSimpleCalendar(
+        child: FlutterSimpleCustomizeCalendar(
           locale: 'ja',
           dayTextStyle: setDayTextStyle(),
           limitMinDate: DateTime(DateTime.now().year,

@@ -38,7 +38,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "rianhotate.flutter_simple_calendar_example"
+        applicationId "rianhotate.flutter_simple_customize_calendar_example"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()

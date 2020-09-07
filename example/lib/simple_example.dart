@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_simple_calendar/flutter_simple_calendar.dart';
+import 'package:flutter_simple_customize_calendar/flutter_simple_customize_calendar.dart';
 
 class SimpleExample extends StatefulWidget {
   @override
@@ -15,7 +15,7 @@ class _SimpleExampleState extends State<SimpleExample> {
         title: const Text('Simple Calendar'),
       ),
       body: Center(
-        child: FlutterSimpleCalendar(
+        child: FlutterSimpleCustomizeCalendar(
           onDayPressed: (DateTime date) {
             print(date);
           },

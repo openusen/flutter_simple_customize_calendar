@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_simple_calendar/flutter_simple_calendar.dart';
+import 'package:flutter_simple_customize_calendar/flutter_simple_customize_calendar.dart';
 
 class CustomParamExample extends StatefulWidget {
   @override
@@ -28,7 +28,7 @@ class _CustomParamExampleState extends State<CustomParamExample> {
           ),
           Expanded(
             child: Center(
-              child: FlutterSimpleCalendar(
+              child: FlutterSimpleCustomizeCalendar(
                 rangedSelectable: _rangeMode,
                 onDayPressed: (DateTime date) {
                   print(date);

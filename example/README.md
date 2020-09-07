@@ -1,6 +1,6 @@
-# flutter_simple_calendar_example
+# flutter_simple_customize_calendar_example
 
-Demonstrates how to use the flutter_simple_calendar plugin.
+Demonstrates how to use the flutter_simple_customize_calendar plugin.
 
 ## Getting Started
 
