@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart' show DateFormat;
+import 'package:intl/date_symbol_data_file.dart';
+import 'package:intl/intl.dart';
 
 enum WEEKDAY_PATTERN { short, normal }
 
@@ -86,7 +86,7 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting();
+    initializeDateFormatting(widget.locale, null);
 
     if (_rangedSelectedDate == null ||
         _rangedSelectedDate.length != 2 ||
