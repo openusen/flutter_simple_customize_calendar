@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_file.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 enum WEEKDAY_PATTERN { short, normal }
@@ -41,7 +41,7 @@ class FlutterSimpleCustomizeCalendar extends StatefulWidget {
 
   FlutterSimpleCustomizeCalendar({
     Key key,
-    this.locale = 'en',
+    this.locale = 'ja',
     this.weekDayPattern = WEEKDAY_PATTERN.short,
     this.weekdayContainerDecoration = const BoxDecoration(),
     this.dayContainerRadius,
