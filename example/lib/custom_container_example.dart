@@ -93,12 +93,12 @@ class _CustomContainerExampleState extends State<CustomContainerExample> {
             ),
             child: Stack(
               children: <Widget>[
-                FlatButton(
+                MaterialButton(
                   disabledTextColor: Colors.black12,
                   textColor: showDate.difference(targetDay).inDays == 0
                       ? Colors.white
                       : targetMonthDate.month == showDate.month
-                          ? setDayTextStyle()[showDate.weekday].color
+                          ? setDayTextStyle()[showDate.weekday]?.color
                           : Colors.grey,
                   onPressed: disable
                       ? null
@@ -125,12 +125,12 @@ class _CustomContainerExampleState extends State<CustomContainerExample> {
     );
   }
 
-  Widget _getHeader(DateTime targetDate, bool prevDisable, bool nextDisable,
-      DateTime currentMonth, Function() onLeftPressed, onRightPressed) {
+  Widget _getHeader(DateTime? targetDate, bool prevDisable, bool nextDisable,
+      DateTime? currentMonth, Function() onLeftPressed, onRightPressed) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        FlatButton(
+        MaterialButton(
           onPressed: prevDisable
               ? null
               : () {
@@ -138,8 +138,8 @@ class _CustomContainerExampleState extends State<CustomContainerExample> {
                 },
           child: Icon(Icons.arrow_back_ios),
         ),
-        Text('${DateFormat.yM('ja').format(currentMonth)}'),
-        FlatButton(
+        Text('${DateFormat.yM('ja').format(currentMonth ?? DateTime.now())}'),
+        MaterialButton(
           onPressed: nextDisable
               ? null
               : () {

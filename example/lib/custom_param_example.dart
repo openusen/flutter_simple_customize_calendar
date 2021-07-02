@@ -22,7 +22,7 @@ class _CustomParamExampleState extends State<CustomParamExample> {
             title: Text('Ranged Mode'),
             onChanged: (value) {
               setState(() {
-                _rangeMode = value;
+                _rangeMode = value ?? false;
               });
             },
           ),
@@ -47,7 +47,7 @@ class _CustomParamExampleState extends State<CustomParamExample> {
                 ),
                 limitMinDate: DateTime.now(),
                 dayContainerRadius: BorderRadius.circular(10),
-                onRangedChange: (List<DateTime> rangedDate) {
+                onRangedChange: (List<DateTime>? rangedDate) {
                   print(rangedDate);
                 },
               ),

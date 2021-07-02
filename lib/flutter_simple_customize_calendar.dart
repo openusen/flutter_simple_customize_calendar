@@ -8,39 +8,39 @@ enum WEEKDAY_PATTERN { short, normal }
 typedef Widget DayContainer(DateTime showDate, DateTime targetMonthDate,
     bool disable, Function(DateTime) onPressed);
 typedef Widget HeaderContainer(
-    DateTime targetDate,
+    DateTime? targetDate,
     bool prevDisable,
     bool nextDisable,
-    DateTime _currentMonth,
+    DateTime? _currentMonth,
     Function() onLeftPressed,
     Function() onRightPressed);
 typedef Widget WeekdayContainer(String weekdayStr);
 
 class FlutterSimpleCustomizeCalendar extends StatefulWidget {
   final String locale;
-  final DateTime targetDay; // default: DateTime.now()
-  final DateTime limitMinDate; // default: 30 years ago from DateTime.now()
-  final DateTime limitMaxDate; // default: 30 years from DateTime.now()
+  final DateTime? targetDay; // default: DateTime.now()
+  final DateTime? limitMinDate; // default: 30 years ago from DateTime.now()
+  final DateTime? limitMaxDate; // default: 30 years from DateTime.now()
   final int firstWeekday; // default: 0 (sunday)
   final WEEKDAY_PATTERN weekDayPattern; // default: short
   final BoxDecoration weekdayContainerDecoration;
-  final BorderRadius dayContainerRadius;
+  final BorderRadius? dayContainerRadius;
   final Color dayContainerDefaultColor;
   final Color dayContainerSelectedColor;
   final Color dayContainerDisableColor;
-  final Map<int, TextStyle> dayTextStyle;
-  final List<TextStyle> weekdayTextStyle;
+  final Map<int, TextStyle>? dayTextStyle;
+  final List<TextStyle>? weekdayTextStyle;
   final TextStyle otherTargetMonthTextStyle;
   final TextStyle disableTextStyle;
   final Function(DateTime) onDayPressed;
-  final Function(List<DateTime>) onRangedChange;
-  final DayContainer dayWidget;
-  final HeaderContainer headerWidget;
-  final WeekdayContainer weekdayWidget;
+  final Function(List<DateTime>?)? onRangedChange;
+  final DayContainer? dayWidget;
+  final HeaderContainer? headerWidget;
+  final WeekdayContainer? weekdayWidget;
   final bool rangedSelectable; // default: false
 
   FlutterSimpleCustomizeCalendar({
-    Key key,
+    Key? key,
     this.locale = 'ja',
     this.weekDayPattern = WEEKDAY_PATTERN.short,
     this.weekdayContainerDecoration = const BoxDecoration(),
@@ -58,7 +58,7 @@ class FlutterSimpleCustomizeCalendar extends StatefulWidget {
     this.disableTextStyle = const TextStyle(
       color: Colors.grey,
     ),
-    @required this.onDayPressed,
+    required this.onDayPressed,
     this.onRangedChange,
     this.dayWidget,
     this.headerWidget,
@@ -73,15 +73,15 @@ class FlutterSimpleCustomizeCalendar extends StatefulWidget {
 }
 
 class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeCalendar> {
-  DateTime targetDay;
-  DateTime _currentMonth;
-  List<TextStyle> _weekdayTextStyle = [];
-  Map<int, TextStyle> _dayTextStyle = {};
-  PageController _controller;
-  DateTime _minDate;
-  DateTime _maxDate;
-  int _currentPage;
-  List<DateTime> _rangedSelectedDate;
+  DateTime? targetDay;
+  DateTime? _currentMonth;
+  List<TextStyle>? _weekdayTextStyle = [];
+  Map<int, TextStyle>? _dayTextStyle = {};
+  PageController? _controller;
+  late DateTime _minDate;
+  late DateTime _maxDate;
+  late int _currentPage;
+  List<DateTime>? _rangedSelectedDate;
 
   @override
   void initState() {
@@ -89,8 +89,8 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
     initializeDateFormatting(widget.locale, null);
 
     if (_rangedSelectedDate == null ||
-        _rangedSelectedDate.length != 2 ||
-        _rangedSelectedDate[0].difference(_rangedSelectedDate[1]).inDays < 0) {
+        _rangedSelectedDate!.length != 2 ||
+        _rangedSelectedDate![0].difference(_rangedSelectedDate![1]).inDays < 0) {
       _rangedSelectedDate = [
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
@@ -99,34 +99,34 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
 
     _minDate = widget.limitMinDate == null
         ? DateTime(DateTime.now().year - 30)
-        : DateTime(widget.limitMinDate.year, widget.limitMinDate.month,
-            widget.limitMinDate.day);
+        : DateTime(widget.limitMinDate!.year, widget.limitMinDate!.month,
+            widget.limitMinDate!.day);
     _maxDate = widget.limitMaxDate == null
         ? DateTime(DateTime.now().year + 30)
-        : DateTime(widget.limitMaxDate.year, widget.limitMaxDate.month,
-            widget.limitMaxDate.day);
+        : DateTime(widget.limitMaxDate!.year, widget.limitMaxDate!.month,
+            widget.limitMaxDate!.day);
 
     if (widget.targetDay == null)
       targetDay = DateTime(
           DateTime.now().year, DateTime.now().month, DateTime.now().day);
     else
       targetDay = DateTime(
-          widget.targetDay.year, widget.targetDay.month, widget.targetDay.day);
+          widget.targetDay!.year, widget.targetDay!.month, widget.targetDay!.day);
 
-    _currentMonth = _getMonthFirstDay(targetDay);
+    _currentMonth = _getMonthFirstDay(targetDay!);
 
-    if (widget.weekdayTextStyle == null || widget.weekdayTextStyle.length < 7)
+    if (widget.weekdayTextStyle == null || widget.weekdayTextStyle!.length < 7)
       for (int i = 0; i < 7; i++) {
-        _weekdayTextStyle.add(TextStyle(
+        _weekdayTextStyle!.add(TextStyle(
           color: Colors.black,
         ));
       }
     else
       _weekdayTextStyle = widget.weekdayTextStyle;
 
-    if (widget.dayTextStyle == null || widget.dayTextStyle.length < 7)
+    if (widget.dayTextStyle == null || widget.dayTextStyle!.length < 7)
       for (int i = 1; i <= 7; i++) {
-        _dayTextStyle.putIfAbsent(
+        _dayTextStyle!.putIfAbsent(
             i,
             () => TextStyle(
                   color: Colors.black,
@@ -145,7 +145,7 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
             0;
         i++) {
       if (DateTime(startDate.year, startDate.month + i)
-              .difference(DateTime(targetDay.year, targetDay.month))
+              .difference(DateTime(targetDay!.year, targetDay!.month))
               .inDays ==
           0) {
         _controller = PageController(
@@ -158,13 +158,13 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
 
   @override
   void didUpdateWidget(Widget oldWidget) {
-    super.didUpdateWidget(oldWidget);
+    super.didUpdateWidget(oldWidget as FlutterSimpleCustomizeCalendar);
     if (widget.targetDay == null)
       targetDay = DateTime(
           DateTime.now().year, DateTime.now().month, DateTime.now().day);
     else
       targetDay = DateTime(
-          widget.targetDay.year, widget.targetDay.month, widget.targetDay.day);
+          widget.targetDay!.year, widget.targetDay!.month, widget.targetDay!.day);
   }
 
   DateTime _getMonthFirstDay(DateTime targetMonthDate) {
@@ -182,7 +182,7 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
             -_getMonthFirstDay(targetMonthDate).weekday + widget.firstWeekday));
   }
 
-  List<Widget> _getShowWeekday(DateTime targetMonthDate) {
+  List<Widget> _getShowWeekday(DateTime? targetMonthDate) {
     List<Widget> weekdayList = [];
     for (int i = 0; i < 7; i++) {
       String weekdayStr;
@@ -206,14 +206,14 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
 
       weekdayList.add(
         widget.weekdayWidget != null
-            ? widget.weekdayWidget(weekdayStr)
+            ? widget.weekdayWidget!(weekdayStr)
             : Expanded(
                 child: Container(
                   decoration: widget.weekdayContainerDecoration,
                   child: Center(
                     child: Text(
                       weekdayStr,
-                      style: _weekdayTextStyle[index],
+                      style: _weekdayTextStyle![index],
                     ),
                   ),
                 ),
@@ -234,7 +234,7 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
         DateTime showDate = startDay.add(Duration(days: dayCnt + weekCnt * 7));
         weekWidgetList.add(
           widget.dayWidget != null
-              ? widget.dayWidget(
+              ? widget.dayWidget!(
                   showDate,
                   targetMonthDate,
                   _checkPrevDayMinDate(showDate) ||
@@ -268,18 +268,18 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
                   _checkNextDayMaxDate(showDate)
               ? widget.dayContainerDisableColor
               : widget.rangedSelectable
-                  ? _rangedSelectedDate[0].difference(showDate).inDays <= 0 &&
-                          _rangedSelectedDate[1].difference(showDate).inDays >=
+                  ? _rangedSelectedDate![0].difference(showDate).inDays <= 0 &&
+                          _rangedSelectedDate![1].difference(showDate).inDays >=
                               0
                       ? widget.dayContainerSelectedColor
                       : widget.dayContainerDefaultColor
-                  : showDate.difference(targetDay).inDays == 0
+                  : showDate.difference(targetDay!).inDays == 0
                       ? widget.dayContainerSelectedColor
                       : widget.dayContainerDefaultColor,
           child: FlatButton(
             disabledTextColor: widget.disableTextStyle.color,
             textColor: targetMonthDate.month == showDate.month
-                ? _dayTextStyle[showDate.weekday].color
+                ? _dayTextStyle![showDate.weekday]!.color
                 : widget.otherTargetMonthTextStyle.color,
             onPressed:
                 _checkPrevDayMinDate(showDate) || _checkNextDayMaxDate(showDate)
@@ -288,44 +288,44 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
                         setState(() {
                           targetDay = showDate;
                           if (widget.rangedSelectable) {
-                            if (_rangedSelectedDate[0] == showDate ||
-                                _rangedSelectedDate[1] == showDate) {
-                              _rangedSelectedDate[0] = showDate;
-                              _rangedSelectedDate[1] = showDate;
-                            } else if (_rangedSelectedDate[0]
+                            if (_rangedSelectedDate![0] == showDate ||
+                                _rangedSelectedDate![1] == showDate) {
+                              _rangedSelectedDate![0] = showDate;
+                              _rangedSelectedDate![1] = showDate;
+                            } else if (_rangedSelectedDate![0]
                                     .difference(showDate)
                                     .inDays >
                                 0) {
-                              _rangedSelectedDate[0] = showDate;
-                            } else if (_rangedSelectedDate[1]
+                              _rangedSelectedDate![0] = showDate;
+                            } else if (_rangedSelectedDate![1]
                                     .difference(showDate)
                                     .inDays <
                                 0) {
-                              _rangedSelectedDate[1] = showDate;
-                            } else if (_rangedSelectedDate[0]
+                              _rangedSelectedDate![1] = showDate;
+                            } else if (_rangedSelectedDate![0]
                                     .difference(showDate)
                                     .inDays
                                     .abs() <=
-                                _rangedSelectedDate[1]
+                                _rangedSelectedDate![1]
                                     .difference(showDate)
                                     .inDays
                                     .abs()) {
-                              _rangedSelectedDate[0] = showDate;
-                            } else if (_rangedSelectedDate[0]
+                              _rangedSelectedDate![0] = showDate;
+                            } else if (_rangedSelectedDate![0]
                                     .difference(showDate)
                                     .inDays
                                     .abs() >
-                                _rangedSelectedDate[1]
+                                _rangedSelectedDate![1]
                                     .difference(showDate)
                                     .inDays
                                     .abs()) {
-                              _rangedSelectedDate[1] = showDate;
+                              _rangedSelectedDate![1] = showDate;
                             }
                           }
                         });
                         widget.onDayPressed(showDate);
                         if (widget.onRangedChange != null)
-                          widget.onRangedChange(_rangedSelectedDate);
+                          widget.onRangedChange!(_rangedSelectedDate);
                       },
             child: Text(
               '${showDate.day}',
@@ -380,21 +380,21 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
     return Row(
       children: <Widget>[
         FlatButton(
-          onPressed: _checkPrevMonthShowDisable(_currentMonth)
+          onPressed: _checkPrevMonthShowDisable(_currentMonth!)
               ? null
               : () {
-                  _controller.previousPage(
+                  _controller!.previousPage(
                       duration: Duration(milliseconds: 500),
                       curve: Curves.easeInOutQuart);
                 },
           child: Icon(Icons.arrow_back_ios),
         ),
-        Text('${DateFormat.yM(widget.locale).format(_currentMonth)}'),
+        Text('${DateFormat.yM(widget.locale).format(_currentMonth!)}'),
         FlatButton(
-          onPressed: _checkNextMonthShowDisable(_currentMonth)
+          onPressed: _checkNextMonthShowDisable(_currentMonth!)
               ? null
               : () {
-                  _controller.nextPage(
+                  _controller!.nextPage(
                       duration: Duration(milliseconds: 500),
                       curve: Curves.easeInOutQuart);
                 },
@@ -409,16 +409,16 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
     return Column(
       children: <Widget>[
         widget.headerWidget != null
-            ? widget.headerWidget(
+            ? widget.headerWidget!(
                 targetDay,
-                _checkPrevMonthShowDisable(_currentMonth),
-                _checkNextMonthShowDisable(_currentMonth),
+                _checkPrevMonthShowDisable(_currentMonth!),
+                _checkNextMonthShowDisable(_currentMonth!),
                 _currentMonth, () {
-                _controller.animateToPage(_currentPage - 1,
+                _controller!.animateToPage(_currentPage - 1,
                     duration: Duration(milliseconds: 500),
                     curve: Curves.easeInOutQuart);
               }, () {
-                _controller.animateToPage(_currentPage + 1,
+                _controller!.animateToPage(_currentPage + 1,
                     duration: Duration(milliseconds: 500),
                     curve: Curves.easeInOutQuart);
               })
@@ -431,8 +431,8 @@ class _FlutterSimpleCustomizeCalendarState extends State<FlutterSimpleCustomizeC
             controller: _controller,
             onPageChanged: (int index) {
               setState(() {
-                _currentMonth = DateTime(_currentMonth.year,
-                    _currentMonth.month - (_currentPage - index));
+                _currentMonth = DateTime(_currentMonth!.year,
+                    _currentMonth!.month - (_currentPage - index));
               });
               _currentPage = index;
             },
